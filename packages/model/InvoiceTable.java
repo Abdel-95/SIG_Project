@@ -1,11 +1,11 @@
-package invoices;
+package packages.model;
 
 import java.util.ArrayList;
 
 import javax.swing.table.AbstractTableModel;
 
 public class InvoiceTable extends AbstractTableModel {
-    public ArrayList <Invoice> invoices;
+    ArrayList <InvoiceHeader> invoices;
 
     private final String[] columnNames = new String[] {
         "No.",
@@ -18,24 +18,32 @@ public class InvoiceTable extends AbstractTableModel {
     };
 
     public InvoiceTable() {
-        invoices = new ArrayList <Invoice> ();
+        invoices = new ArrayList <InvoiceHeader> ();
     }
 
     public InvoiceTable(InvoiceTable invoiceTable) {
-        this.invoices = new ArrayList <Invoice> ();
+        this.invoices = new ArrayList <InvoiceHeader> ();
         for (int i = 0; i < invoiceTable.invoices.size(); i++) {
-            this.invoices.add(new Invoice(invoiceTable.invoices.get(i)));
+            this.invoices.add(new InvoiceHeader(invoiceTable.invoices.get(i)));
         }
     }
 
-    public void createInvoice(int no, String date, String customer, int total, ArrayList <InvoiceItem> arrayList) {
+    public void setInvoices(ArrayList<InvoiceHeader> invoices) {
+        this.invoices = new ArrayList<>(invoices);
+    }
+
+    public ArrayList<InvoiceHeader> getInvoices() {
+        return invoices;
+    }
+
+    public void createInvoice(int no, String date, String customer, int total, ArrayList <InvoiceLine> arrayList) {
         int invoiceNo = no != -1 ? no : invoices.get(invoices.size() - 1).no + 1;
-        Invoice newInvoice = new Invoice(invoiceNo, date, customer, total, arrayList);
+        InvoiceHeader newInvoice = new InvoiceHeader(invoiceNo, date, customer, total, arrayList);
         invoices.add(newInvoice);
     }
 
     public void addItemToSpecificInvoice(int invoiceNo, String itemName, int itemPrice, int count) {
-        Invoice invoice = invoices.stream().filter(item -> item.no == invoiceNo).findFirst().orElse(null);
+        InvoiceHeader invoice = invoices.stream().filter(item -> item.no == invoiceNo).findFirst().orElse(null);
         if (invoice != null) {
             invoice.addInvoiceItem(itemName, itemPrice, count, itemPrice * count);
             invoice.total += (itemPrice * count);
@@ -43,17 +51,17 @@ public class InvoiceTable extends AbstractTableModel {
 
     }
 
-    public void updateInvoice(int no, String date, String customer, int total, ArrayList <InvoiceItem> invoiceItems) {
-        Invoice invoice = invoices.stream().filter(item -> item.no == no).findFirst().orElse(null);
+    public void updateInvoice(int no, String date, String customer, int total, ArrayList <InvoiceLine> invoiceItems) {
+        InvoiceHeader invoice = invoices.stream().filter(item -> item.no == no).findFirst().orElse(null);
         if (invoice != null) {
             int index = invoices.indexOf(invoice);
-            Invoice newInvoice = new Invoice(no, date, customer, total, invoiceItems);
+            InvoiceHeader newInvoice = new InvoiceHeader(no, date, customer, total, invoiceItems);
             invoices.set(index, newInvoice);
         }
     }
 
     public void deleteInvoice(int no) {
-        Invoice invoice = invoices.stream().filter(item -> item.no == no).findFirst().orElse(null);
+        InvoiceHeader invoice = invoices.stream().filter(item -> item.no == no).findFirst().orElse(null);
         if (invoice != null) {
             invoices.remove(invoice);
         }
@@ -81,7 +89,7 @@ public class InvoiceTable extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        Invoice row = invoices.get(rowIndex);
+        InvoiceHeader row = invoices.get(rowIndex);
         if (0 == columnIndex) {
             return row.no;
         } else if (1 == columnIndex) {

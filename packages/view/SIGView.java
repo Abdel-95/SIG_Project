@@ -1,19 +1,16 @@
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
+package packages.view;
+
+import javax.swing.JFrame;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.*;
 import static javax.swing.JOptionPane.showMessageDialog;
 
-import invoices.*;
+import packages.controller.SIGController;
+import packages.model.InvoiceHeader;
 
-class SIG {
+public class SIGView extends JFrame {
     // Variables declaration - do not modify                     
     private static javax.swing.JButton loadFileButton;
     private static javax.swing.JButton saveFileButton;
@@ -38,21 +35,20 @@ class SIG {
     private static javax.swing.JTextField invoiceCustomerNameTextField;
     // End of variables declaration
 
-    private static Invoice oldInvoice;
-    private static InvoiceTable invoiceTable = new InvoiceTable();
+    private SIGController sigController;
 
-
-    public static void main(String args[]) {
-        loadInvoices();
-        loadInvoicesItems();
-
+    public SIGView(SIGController sigController) {
+        this.sigController = sigController;
+    }
+    
+    public void startFrame() {
         JFrame frame = new JFrame("SIG");
         initComponents(frame);
         frame.pack();
         frame.setVisible(true);
     }
 
-    private static void initComponents(JFrame frame) {
+    private void initComponents(JFrame frame) {
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
         jScrollPane2 = new javax.swing.JScrollPane();
@@ -78,14 +74,14 @@ class SIG {
         frame.setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
 
-        jTable1.setModel(invoiceTable);
+        jTable1.setModel(sigController.getInvoiceTable());
         jScrollPane1.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         jScrollPane1.setViewportView(jTable1);
 
-        jTable2.setModel(invoiceTable.invoices.get(0));
+        jTable2.setModel(sigController.getInvoiceTable().getInvoices().get(0));
         jScrollPane2.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         jScrollPane2.setViewportView(jTable2);
-        oldInvoice = new Invoice(invoiceTable.invoices.get(0));
+        sigController.oldInvoiceChanged(sigController.getInvoiceTable().getInvoices().get(0));
 
         jTable1.setRowSelectionAllowed(true);
         jTable1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -100,13 +96,13 @@ class SIG {
 
         invoiceNumberTitleLabel.setText("Invoice Number:");
 
-        Invoice selectedInvoice = invoiceTable.invoices.get(0);
+        InvoiceHeader selectedInvoice = sigController.getInvoiceTable().getInvoices().get(0);
         jTable2.setModel(selectedInvoice);
-        invoiceNoLabel.setText(Integer.toString(selectedInvoice.no));
-        invoiceTotalLabel.setText(Integer.toString(selectedInvoice.total));
-        invoiceCustomerNameTextField.setText(selectedInvoice.customer);
-        invoiceDateTextField.setText(selectedInvoice.date);
-        jTable1.setRowSelectionInterval(selectedInvoice.no - 1, selectedInvoice.no - 1);
+        invoiceNoLabel.setText(Integer.toString(selectedInvoice.getNo()));
+        invoiceTotalLabel.setText(Integer.toString(selectedInvoice.getTotal()));
+        invoiceCustomerNameTextField.setText(selectedInvoice.getCustomer());
+        invoiceDateTextField.setText(selectedInvoice.getDate());
+        jTable1.setRowSelectionInterval(selectedInvoice.getNo() - 1, selectedInvoice.getNo() - 1);
 
 
         invoiceDateLabel.setText("Invoice Date:");
@@ -275,38 +271,38 @@ class SIG {
 
     }
 
-    protected static void selectedInvoiceRowChanged() {
+    protected void selectedInvoiceRowChanged() {
         int index = jTable1.getSelectedRow() != -1 ? jTable1.getSelectedRow() : 0;
-        if (index <= invoiceTable.invoices.size() - 1) {
-            Invoice selectedInvoice = invoiceTable.invoices.get(index);
+        if (index <= sigController.getInvoiceTable().getInvoices().size() - 1) {
+            InvoiceHeader selectedInvoice = sigController.getInvoiceTable().getInvoices().get(index);
             jTable2.setModel(selectedInvoice);
             ((AbstractTableModel) jTable2.getModel()).fireTableDataChanged();
-            invoiceNoLabel.setText(Integer.toString(selectedInvoice.no));
-            invoiceTotalLabel.setText(Integer.toString(selectedInvoice.total));
-            invoiceCustomerNameTextField.setText(selectedInvoice.customer);
-            invoiceDateTextField.setText(selectedInvoice.date);
-            oldInvoice = new Invoice(selectedInvoice);
+            invoiceNoLabel.setText(Integer.toString(selectedInvoice.getNo()));
+            invoiceTotalLabel.setText(Integer.toString(selectedInvoice.getTotal()));
+            invoiceCustomerNameTextField.setText(selectedInvoice.getCustomer());
+            invoiceDateTextField.setText(selectedInvoice.getDate());
+            sigController.oldInvoiceChanged(selectedInvoice);
         }
     }
 
-    protected static void addInvoiceItemButtonActionPerformed() {
-        Invoice selectedInvoice = invoiceTable.invoices.get(jTable1.getSelectedRow() != -1 ? jTable1.getSelectedRow() : 0);
-        invoiceTable.addItemToSpecificInvoice(selectedInvoice.no, "", 0, 0);
+    protected void addInvoiceItemButtonActionPerformed() {
+        InvoiceHeader selectedInvoice = sigController.getInvoiceTable().getInvoices().get(jTable1.getSelectedRow() != -1 ? jTable1.getSelectedRow() : 0);
+        sigController.addInvoiceItemActionPerformed(selectedInvoice);
         jTable2.setModel(selectedInvoice);
         ((AbstractTableModel) jTable2.getModel()).fireTableDataChanged();
     }
 
-    protected static void cancelButtonActionPerformed() {
-        invoiceTable.invoices.set(jTable1.getSelectedRow() != -1 ? jTable1.getSelectedRow() : 0, new Invoice(oldInvoice));
-        jTable2.setModel(invoiceTable.invoices.get(jTable1.getSelectedRow() != -1 ? jTable1.getSelectedRow() : 0));
+    protected void cancelButtonActionPerformed() {
+        sigController.cancelActionPerformed(jTable1.getSelectedRow() != -1 ? jTable1.getSelectedRow() : 0);
+        jTable2.setModel(sigController.getInvoiceTable().getInvoices().get(jTable1.getSelectedRow() != -1 ? jTable1.getSelectedRow() : 0));
         ((AbstractTableModel) jTable2.getModel()).fireTableDataChanged();
-        invoiceNoLabel.setText(Integer.toString(oldInvoice.no));
-        invoiceTotalLabel.setText(Integer.toString(oldInvoice.total));
-        invoiceCustomerNameTextField.setText(oldInvoice.customer);
-        invoiceDateTextField.setText(oldInvoice.date);
+        invoiceNoLabel.setText(Integer.toString(sigController.getOldInvoice().getNo()));
+        invoiceTotalLabel.setText(Integer.toString(sigController.getOldInvoice().getTotal()));
+        invoiceCustomerNameTextField.setText(sigController.getOldInvoice().getCustomer());
+        invoiceDateTextField.setText(sigController.getOldInvoice().getDate());
     }
 
-    protected static void saveInvoiceButtonActionPerformed() {
+    protected void saveInvoiceButtonActionPerformed() {
         int index = jTable1.getSelectedRow() != -1 ? jTable1.getSelectedRow() : 0;
         if (!invoiceDateTextField.getText().matches("([0-9]{2})-([0-9]{2})-([0-9]{4})")) {
             showMessageDialog(null, "Date must be in the format: dd-mm-yyyy.");
@@ -316,111 +312,57 @@ class SIG {
             jTable2.getCellEditor().stopCellEditing();
         } catch (Exception e) {}
 
-        Invoice selectedInvoice = invoiceTable.invoices.get(index);
-        selectedInvoice.customer = invoiceCustomerNameTextField.getText();
-        selectedInvoice.date = invoiceDateTextField.getText();
-        selectedInvoice.calculateTotal();
-        invoiceTotalLabel.setText(Integer.toString(selectedInvoice.total));
-        jTable1.setModel(invoiceTable);
+        InvoiceHeader selectedInvoice = sigController.getInvoiceTable().getInvoices().get(index);
+        sigController.saveInvoiceActionPerformed(selectedInvoice, invoiceCustomerNameTextField.getText(), invoiceDateTextField.getText());
+        
+        invoiceTotalLabel.setText(Integer.toString(selectedInvoice.getTotal()));
+        jTable1.setModel(sigController.getInvoiceTable());
         ((AbstractTableModel) jTable1.getModel()).fireTableDataChanged();
         jTable1.setRowSelectionInterval(index, index);
-        oldInvoice = new Invoice(selectedInvoice);
+        sigController.oldInvoiceChanged(selectedInvoice);
     }
 
-    protected static void deleteInvoiceButtonActionPerformed() {
-        if (invoiceTable.invoices.size() == 1) {
+    protected void deleteInvoiceButtonActionPerformed() {
+        if (sigController.getInvoiceTable().getInvoices().size() == 1) {
             showMessageDialog(null, "You can't delete this invoice. The invoices table must contain at least one invoice.");
             return;
         }
         int indexToDelete = jTable1.getSelectedRow() != -1 ? jTable1.getSelectedRow() : 0;
-        if (indexToDelete <= invoiceTable.invoices.size() - 1) {
-            Invoice selectedInvoice = invoiceTable.invoices.get(indexToDelete);
-            invoiceTable.deleteInvoice(selectedInvoice.no);
-            jTable1.setModel(invoiceTable);
+        if (indexToDelete <= sigController.getInvoiceTable().getInvoices().size() - 1) {
+            InvoiceHeader selectedInvoice = sigController.getInvoiceTable().getInvoices().get(indexToDelete);
+            sigController.deleteInvoiceActionPerformed(selectedInvoice);
+            jTable1.setModel(sigController.getInvoiceTable());
             ((AbstractTableModel) jTable1.getModel()).fireTableDataChanged();
             int indexToSelect = indexToDelete> 0 ? indexToDelete - 1 : 0;
-            if (indexToSelect <= invoiceTable.invoices.size() - 1) {
+            if (indexToSelect <= sigController.getInvoiceTable().getInvoices().size() - 1) {
                 jTable1.setRowSelectionInterval(indexToSelect, indexToSelect);
             }
         }
 
     }
 
-    protected static void createInvoiceButtonActionPerformed() {
-        ArrayList <InvoiceItem> invoiceItems = new ArrayList <> ();
-        invoiceItems.add(new InvoiceItem(1, "", 0, 0, 0));
-        String date = java.time.LocalDate.now().toString();
-        String[] dateSplitted = date.split("-");
-        String formattedDate = dateSplitted[2] + "-" + dateSplitted[1] + "-" + dateSplitted[0];
-        invoiceTable.createInvoice(-1, formattedDate, "", 0, invoiceItems);
-        jTable1.setModel(invoiceTable);
+    protected void createInvoiceButtonActionPerformed() {
+        sigController.createInvoiceActionPerformed();
+        jTable1.setModel(sigController.getInvoiceTable());
         ((AbstractTableModel) jTable1.getModel()).fireTableDataChanged();
         // selectedInvoiceRowChanged will be changed. 
-        jTable1.setRowSelectionInterval(invoiceTable.invoices.size() - 1, invoiceTable.invoices.size() - 1);
+        jTable1.setRowSelectionInterval(sigController.getInvoiceTable().getInvoices().size() - 1, sigController.getInvoiceTable().getInvoices().size() - 1);
     }
 
-    protected static void saveFileButtonActionPerformed() {
+    protected void saveFileButtonActionPerformed() {
         cancelButtonActionPerformed();
-        try {
-            FileWriter fw = new FileWriter("i_o_files/InvoiceHeader.csv");
-            FileWriter fw1 = new FileWriter("i_o_files/InvoiceLine.csv");
-            for (int i = 0; i < invoiceTable.invoices.size(); i++) {
-                Invoice invoice = invoiceTable.invoices.get(i);
-                fw.write(invoice.no + "," + invoice.date + "," + invoice.customer + "\n");
-                for (int j = 0; j < invoice.invoiceItems.size(); j++) {
-                    InvoiceItem invoiceItem = invoice.invoiceItems.get(j);
-                    fw1.write(invoice.no + "," + invoiceItem.itemName + "," + invoiceItem.itemPrice + "," + invoiceItem.count + "\n");
-                }
-            }
-            fw.close();
-            fw1.close();
-        } catch (FileNotFoundException e) {
-            showMessageDialog(null, "File is not found");
-        } catch (IOException e1) {
-            e1.printStackTrace();
-        }
+        sigController.saveFileActionPerformed();
     }
 
-    protected static void loadFileButtonActionPerformed() {
-        invoiceTable = new InvoiceTable();
-        loadInvoices();
-        loadInvoicesItems();
-        jTable1.setModel(invoiceTable);
+    protected void loadFileButtonActionPerformed() {
+        sigController.loadInvoices();
+        jTable1.setModel(sigController.getInvoiceTable());
         ((AbstractTableModel) jTable1.getModel()).fireTableDataChanged();
         jTable1.setRowSelectionInterval(0, 0);
         selectedInvoiceRowChanged();
-    }
+    } 
 
-    static void loadInvoices() {
-        String line = "";
-        try {
-            BufferedReader br = new BufferedReader(new FileReader("i_o_files/InvoiceHeader.csv"));
-            while ((line = br.readLine()) != null) {
-                String[] invoice = line.split(",");
-                invoiceTable.createInvoice(Integer.parseInt(invoice[0]), invoice[1], invoice[2], 0, new ArrayList <InvoiceItem> ());
-            }
-            br.close();
-        } catch (FileNotFoundException e) {
-            showMessageDialog(null, "File is not found");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    static void loadInvoicesItems() {
-        String line = "";
-        try {
-            BufferedReader br = new BufferedReader(new FileReader("i_o_files/InvoiceLine.csv"));
-            while ((line = br.readLine()) != null) {
-                String[] invoiceItem = line.split(",");
-                invoiceTable.addItemToSpecificInvoice(Integer.parseInt(invoiceItem[0]), invoiceItem[1], Integer.parseInt(invoiceItem[2]), Integer.parseInt(invoiceItem[3]));
-            }
-            br.close();
-        } catch (FileNotFoundException e) {
-            showMessageDialog(null, "File is not found");
-        } 
-        catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void showInvalidFileMessage() {
+        showMessageDialog(null, "File is not found");
     }
 }

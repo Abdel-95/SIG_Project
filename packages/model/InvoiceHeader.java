@@ -1,15 +1,16 @@
-package invoices;
+package packages.model;
 
 import java.util.ArrayList;
 
 import javax.swing.table.AbstractTableModel;
 
-public class Invoice extends AbstractTableModel {
-    public int no;
-    public String date;
-    public String customer;
-    public int total;
-    public ArrayList <InvoiceItem> invoiceItems;
+public class InvoiceHeader extends AbstractTableModel {
+    int no;
+    String date;
+    String customer;
+    int total;
+    ArrayList <InvoiceLine> invoiceItems;
+
 
     private final String[] columnNames = new String[] {
         "No.",
@@ -22,7 +23,7 @@ public class Invoice extends AbstractTableModel {
         Integer.class, String.class, Integer.class, Integer.class, Integer.class
     };
 
-    Invoice(int no, String date, String customer, int total, ArrayList <InvoiceItem> invoiceItems) {
+    InvoiceHeader(int no, String date, String customer, int total, ArrayList <InvoiceLine> invoiceItems) {
         this.no = no;
         this.date = date;
         this.customer = customer;
@@ -30,16 +31,44 @@ public class Invoice extends AbstractTableModel {
         this.invoiceItems = invoiceItems;
     }
 
-    public Invoice(Invoice inv) {
+    public InvoiceHeader(InvoiceHeader inv) {
         this.no = inv.no;
         this.date = inv.date;
         this.customer = inv.customer;
         this.total = inv.total;
-        this.invoiceItems = new ArrayList <InvoiceItem> (inv.invoiceItems);
+        this.invoiceItems = new ArrayList <InvoiceLine> (inv.invoiceItems);
+    }
+
+    public int getNo() {
+        return no;
+    }
+    
+    public String getDate() {
+        return date;
+    }
+
+    public String getCustomer() {
+        return customer;
+    }
+
+    public int getTotal() {
+        return total;
+    }
+
+    public ArrayList<InvoiceLine> getInvoiceItems() {
+        return invoiceItems;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public void setCustomer(String customer) {
+        this.customer = customer;
     }
 
     public void addInvoiceItem(String itemName, int itemPrice, int count, int itemTotal) {
-        InvoiceItem newInvoiceItem = new InvoiceItem(invoiceItems.size() + 1, itemName, itemPrice, count, itemTotal);
+        InvoiceLine newInvoiceItem = new InvoiceLine(invoiceItems.size() + 1, itemName, itemPrice, count, itemTotal);
         invoiceItems.add(newInvoiceItem);
     }
 
@@ -66,7 +95,7 @@ public class Invoice extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        InvoiceItem row = invoiceItems.get(rowIndex);
+        InvoiceLine row = invoiceItems.get(rowIndex);
         if (0 == columnIndex) {
             return row.no;
         } else if (1 == columnIndex) {
@@ -88,7 +117,7 @@ public class Invoice extends AbstractTableModel {
 
     @Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-        InvoiceItem row = invoiceItems.get(rowIndex);
+        InvoiceLine row = invoiceItems.get(rowIndex);
         if (0 == columnIndex) {
             row.no = ((Integer) aValue);
         } else if (1 == columnIndex) {
