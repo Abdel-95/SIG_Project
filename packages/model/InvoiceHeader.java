@@ -39,10 +39,14 @@ public class InvoiceHeader extends AbstractTableModel {
         this.invoiceItems = new ArrayList <InvoiceLine> (inv.invoiceItems);
     }
 
+    public InvoiceHeader() {
+        invoiceItems = new ArrayList<>();
+    }
+
     public int getNo() {
         return no;
     }
-    
+
     public String getDate() {
         return date;
     }
@@ -67,11 +71,17 @@ public class InvoiceHeader extends AbstractTableModel {
         this.customer = customer;
     }
 
-    public void addInvoiceItem(String itemName, int itemPrice, int count, int itemTotal) {
-        InvoiceLine newInvoiceItem = new InvoiceLine(invoiceItems.size() + 1, itemName, itemPrice, count, itemTotal);
+    public void addInvoiceItem(int invNo,String itemName, int itemPrice, int count, int itemTotal) {
+        InvoiceLine newInvoiceItem = new InvoiceLine(invNo, itemName, itemPrice, count, itemTotal);
         invoiceItems.add(newInvoiceItem);
     }
 
+
+    public void deleteInvoiceItem(int index) {
+        InvoiceLine invoiceItem = invoiceItems.get(index);
+        invoiceItems.remove(invoiceItem);
+        total -= (invoiceItem.itemPrice * invoiceItem.count);
+    }
 
     @Override
     public String getColumnName(int column) {

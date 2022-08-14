@@ -9,8 +9,8 @@ import packages.model.InvoiceLine;
 class SIGMain {
     public static void main(String args[]) {
         SIGController sigController = new SIGController();
-        // Load the invoices from the file and store it in the invoice table model.
-        sigController.loadInvoices();
+        // Load empty tables.
+        sigController.loadEmptyTables();
         // Create the frame with its components using the view and initialize it with the invoice table data stored.
         sigController.startFrame();
         // The required test function.

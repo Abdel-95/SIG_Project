@@ -7,6 +7,8 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 import static javax.swing.JOptionPane.showMessageDialog;
 
+import java.io.Console;
+
 import packages.controller.SIGController;
 import packages.model.InvoiceHeader;
 
@@ -19,6 +21,7 @@ public class SIGView extends JFrame {
     private static javax.swing.JButton saveInvoiceButton;
     private static javax.swing.JButton cancelButton;
     private static javax.swing.JButton addInvoiceItemButton;
+    private static javax.swing.JButton deleteInvoiceItemButton;
     private static javax.swing.JLabel invoicesTableLabel;
     private static javax.swing.JLabel invoiceNumberTitleLabel;
     private static javax.swing.JLabel invoiceNoLabel;
@@ -70,6 +73,7 @@ public class SIGView extends JFrame {
         saveInvoiceButton = new javax.swing.JButton();
         cancelButton = new javax.swing.JButton();
         addInvoiceItemButton = new javax.swing.JButton();
+        deleteInvoiceItemButton = new javax.swing.JButton();
 
         frame.setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -78,10 +82,10 @@ public class SIGView extends JFrame {
         jScrollPane1.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         jScrollPane1.setViewportView(jTable1);
 
-        jTable2.setModel(sigController.getInvoiceTable().getInvoices().get(0));
+        jTable2.setModel(new InvoiceHeader());
         jScrollPane2.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         jScrollPane2.setViewportView(jTable2);
-        sigController.oldInvoiceChanged(sigController.getInvoiceTable().getInvoices().get(0));
+        // sigController.oldInvoiceChanged(sigController.getInvoiceTable().getInvoices().get(0));
 
         jTable1.setRowSelectionAllowed(true);
         jTable1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -92,17 +96,20 @@ public class SIGView extends JFrame {
             }
         });;
 
+        jTable2.setRowSelectionAllowed(true);
+        
+
         invoicesTableLabel.setText("Invoices Table:");
 
         invoiceNumberTitleLabel.setText("Invoice Number:");
 
-        InvoiceHeader selectedInvoice = sigController.getInvoiceTable().getInvoices().get(0);
-        jTable2.setModel(selectedInvoice);
-        invoiceNoLabel.setText(Integer.toString(selectedInvoice.getNo()));
-        invoiceTotalLabel.setText(Integer.toString(selectedInvoice.getTotal()));
-        invoiceCustomerNameTextField.setText(selectedInvoice.getCustomer());
-        invoiceDateTextField.setText(selectedInvoice.getDate());
-        jTable1.setRowSelectionInterval(selectedInvoice.getNo() - 1, selectedInvoice.getNo() - 1);
+        // InvoiceHeader selectedInvoice = sigController.getInvoiceTable().getInvoices().get(0);
+        // jTable2.setModel(selectedInvoice);
+        // invoiceNoLabel.setText(Integer.toString(selectedInvoice.getNo()));
+        // invoiceTotalLabel.setText(Integer.toString(selectedInvoice.getTotal()));
+        // invoiceCustomerNameTextField.setText(selectedInvoice.getCustomer());
+        // invoiceDateTextField.setText(selectedInvoice.getDate());
+        // jTable1.setRowSelectionInterval(selectedInvoice.getNo() - 1, selectedInvoice.getNo() - 1);
 
 
         invoiceDateLabel.setText("Invoice Date:");
@@ -165,6 +172,15 @@ public class SIGView extends JFrame {
             }
         });
 
+        deleteInvoiceItemButton.setText("Delete Invoice Item");
+        deleteInvoiceItemButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                deleteInvoiceItemButtonActionPerformed();
+            }
+        });
+
+
+        
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(frame.getContentPane());
         frame.getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -177,15 +193,16 @@ public class SIGView extends JFrame {
                         .addGap(2, 2, 2)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(invoicesTableLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 270, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(layout.createSequentialGroup()
+                                .addGap(11, 11, 11)
                                 .addComponent(createInvoiceButton)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(deleteInvoiceButton))))
+                                .addComponent(deleteInvoiceButton))
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addComponent(saveFileButton))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(37, 37, 37)
+                        .addGap(43, 43, 43)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -193,34 +210,38 @@ public class SIGView extends JFrame {
                                         .addComponent(invoiceNumberTitleLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                         .addComponent(invoiceNoLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addComponent(invoiceItemsLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addGroup(layout.createSequentialGroup()
                                         .addComponent(invoiceTotalTitleLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                         .addComponent(invoiceTotalLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 340, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 336, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                     .addGroup(layout.createSequentialGroup()
-                                        .addComponent(customerNameLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(customerNameLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                         .addComponent(invoiceCustomerNameTextField))
                                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                                        .addComponent(invoiceDateLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 80, Short.MAX_VALUE)
+                                        .addComponent(invoiceDateLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                         .addComponent(invoiceDateTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 235, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                .addGap(59, 59, 59))))
+                                .addGap(59, 59, 59))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(invoiceItemsLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(100, 100, 100)
+                        .addGap(97, 97, 97)
                         .addComponent(saveInvoiceButton)
                         .addGap(28, 28, 28)
                         .addComponent(cancelButton)
-                        .addGap(0, 0, Short.MAX_VALUE))))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(addInvoiceItemButton)
-                .addGap(179, 179, 179))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(addInvoiceItemButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(deleteInvoiceItemButton)
+                        .addGap(87, 87, 87))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -237,7 +258,7 @@ public class SIGView extends JFrame {
                     .addComponent(saveFileButton))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 27, Short.MAX_VALUE)
                         .addComponent(invoicesTableLabel))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(18, 18, 18)
@@ -258,8 +279,10 @@ public class SIGView extends JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(addInvoiceItemButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 27, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(addInvoiceItemButton)
+                    .addComponent(deleteInvoiceItemButton))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 24, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(createInvoiceButton)
                     .addComponent(deleteInvoiceButton)
@@ -269,6 +292,16 @@ public class SIGView extends JFrame {
         );
 
 
+    }
+
+    protected void deleteInvoiceItemButtonActionPerformed() {
+        if(jTable2.getSelectedRow() != -1) {
+            InvoiceHeader selectedInvoice = sigController.getInvoiceTable().getInvoices().get(jTable1.getSelectedRow() != -1 ? jTable1.getSelectedRow() : 0);
+            int index = jTable2.getSelectedRow();
+            sigController.deleteInvoiceItemActionPerformed(selectedInvoice.getNo(), index);
+            jTable2.setModel(selectedInvoice);
+            ((AbstractTableModel) jTable2.getModel()).fireTableDataChanged();
+        }
     }
 
     protected void selectedInvoiceRowChanged() {
@@ -286,6 +319,7 @@ public class SIGView extends JFrame {
     }
 
     protected void addInvoiceItemButtonActionPerformed() {
+        if(sigController.getInvoiceTable().getInvoices().size() == 0) return;
         InvoiceHeader selectedInvoice = sigController.getInvoiceTable().getInvoices().get(jTable1.getSelectedRow() != -1 ? jTable1.getSelectedRow() : 0);
         sigController.addInvoiceItemActionPerformed(selectedInvoice);
         jTable2.setModel(selectedInvoice);
@@ -293,6 +327,7 @@ public class SIGView extends JFrame {
     }
 
     protected void cancelButtonActionPerformed() {
+        if(sigController.getInvoiceTable().getInvoices().size() == 0) return;
         sigController.cancelActionPerformed(jTable1.getSelectedRow() != -1 ? jTable1.getSelectedRow() : 0);
         jTable2.setModel(sigController.getInvoiceTable().getInvoices().get(jTable1.getSelectedRow() != -1 ? jTable1.getSelectedRow() : 0));
         ((AbstractTableModel) jTable2.getModel()).fireTableDataChanged();
@@ -303,6 +338,7 @@ public class SIGView extends JFrame {
     }
 
     protected void saveInvoiceButtonActionPerformed() {
+        if(sigController.getInvoiceTable().getInvoices().size() == 0) return;
         int index = jTable1.getSelectedRow() != -1 ? jTable1.getSelectedRow() : 0;
         if (!invoiceDateTextField.getText().matches("([0-9]{2})-([0-9]{2})-([0-9]{4})")) {
             showMessageDialog(null, "Date must be in the format: dd-mm-yyyy.");

@@ -32,7 +32,7 @@ public class FileOperations {
                 String[] invoiceItem = line.split(",");
                 InvoiceHeader invoice = invoices.stream().filter(item -> item.no == Integer.parseInt(invoiceItem[0])).findFirst().orElse(null);
                 if (invoice != null) {
-                    invoice.addInvoiceItem(invoiceItem[1], Integer.parseInt(invoiceItem[2]), Integer.parseInt(invoiceItem[3]), Integer.parseInt(invoiceItem[2]) * Integer.parseInt(invoiceItem[3]));
+                    invoice.addInvoiceItem(Integer.parseInt(invoiceItem[0]), invoiceItem[1], Integer.parseInt(invoiceItem[2]), Integer.parseInt(invoiceItem[3]), Integer.parseInt(invoiceItem[2]) * Integer.parseInt(invoiceItem[3]));
                     invoice.total += (Integer.parseInt(invoiceItem[2]) * Integer.parseInt(invoiceItem[3]));
                 }
             }

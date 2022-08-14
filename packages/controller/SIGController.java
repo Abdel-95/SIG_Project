@@ -26,6 +26,10 @@ public class SIGController {
         return oldInvoice;
     }
 
+    public void loadEmptyTables() {
+        invoiceTable = new InvoiceTable();
+    }
+
     public void loadInvoices() {
         invoiceTable = new InvoiceTable();
         try {
@@ -66,7 +70,6 @@ public class SIGController {
     
     public void createInvoiceActionPerformed() {
         ArrayList <InvoiceLine> invoiceItems = new ArrayList <> ();
-        invoiceItems.add(new InvoiceLine(1, "", 0, 0, 0));
         String date = java.time.LocalDate.now().toString();
         String[] dateSplitted = date.split("-");
         String formattedDate = dateSplitted[2] + "-" + dateSplitted[1] + "-" + dateSplitted[0];
@@ -81,5 +84,9 @@ public class SIGController {
         } catch (IOException e1) {
             e1.printStackTrace();
         }
+    }
+
+    public void deleteInvoiceItemActionPerformed(int invoiceNo, int index) {
+        invoiceTable.deleteItemFromSpecificInvoice(invoiceNo, index);
     }
 }

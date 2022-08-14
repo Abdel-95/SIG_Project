@@ -37,7 +37,12 @@ public class InvoiceTable extends AbstractTableModel {
     }
 
     public void createInvoice(int no, String date, String customer, int total, ArrayList <InvoiceLine> arrayList) {
-        int invoiceNo = no != -1 ? no : invoices.get(invoices.size() - 1).no + 1;
+        int invoiceNo;
+        if(no == -1 && invoices.size() == 0) {
+            invoiceNo = 1;
+        } else {
+            invoiceNo = no != -1 ? no : invoices.get(invoices.size() - 1).no + 1;
+        }
         InvoiceHeader newInvoice = new InvoiceHeader(invoiceNo, date, customer, total, arrayList);
         invoices.add(newInvoice);
     }
@@ -45,10 +50,17 @@ public class InvoiceTable extends AbstractTableModel {
     public void addItemToSpecificInvoice(int invoiceNo, String itemName, int itemPrice, int count) {
         InvoiceHeader invoice = invoices.stream().filter(item -> item.no == invoiceNo).findFirst().orElse(null);
         if (invoice != null) {
-            invoice.addInvoiceItem(itemName, itemPrice, count, itemPrice * count);
+            invoice.addInvoiceItem(invoiceNo, itemName, itemPrice, count, itemPrice * count);
             invoice.total += (itemPrice * count);
         }
 
+    }
+
+    public void deleteItemFromSpecificInvoice(int invoiceNo, int index) {
+        InvoiceHeader invoice = invoices.stream().filter(item -> item.no == invoiceNo).findFirst().orElse(null);
+        if (invoice != null) {
+            invoice.deleteInvoiceItem(index);
+        }
     }
 
     public void updateInvoice(int no, String date, String customer, int total, ArrayList <InvoiceLine> invoiceItems) {
