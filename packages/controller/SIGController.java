@@ -33,11 +33,14 @@ public class SIGController {
     public void loadInvoices() {
         invoiceTable = new InvoiceTable();
         try {
-            invoiceTable.setInvoices(fileOperations.readFile());
+            ArrayList<InvoiceHeader> invoices = fileOperations.readFile(false);
+            invoiceTable.setInvoices(invoices);
         } catch (FileNotFoundException e) {
             sigView.showInvalidFileMessage();
         } catch (IOException e) {
             e.printStackTrace();
+        } catch(Exception e) {
+            sigView.showSpecificMessage(e.getMessage()); 
         }   
     }
 
@@ -83,10 +86,16 @@ public class SIGController {
             sigView.showInvalidFileMessage();
         } catch (IOException e1) {
             e1.printStackTrace();
+        } catch (Exception e) {
+            sigView.showSpecificMessage(e.getMessage());
         }
     }
 
     public void deleteInvoiceItemActionPerformed(int invoiceNo, int index) {
         invoiceTable.deleteItemFromSpecificInvoice(invoiceNo, index);
+    }
+
+    public void showSpecificMessage(String msg) {
+        sigView.showSpecificMessage(msg);
     }
 }

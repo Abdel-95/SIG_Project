@@ -391,14 +391,21 @@ public class SIGView extends JFrame {
     }
 
     protected void loadFileButtonActionPerformed() {
-        sigController.loadInvoices();
-        jTable1.setModel(sigController.getInvoiceTable());
-        ((AbstractTableModel) jTable1.getModel()).fireTableDataChanged();
-        jTable1.setRowSelectionInterval(0, 0);
-        selectedInvoiceRowChanged();
+        try {
+            sigController.loadInvoices();
+            jTable1.setModel(sigController.getInvoiceTable());
+            ((AbstractTableModel) jTable1.getModel()).fireTableDataChanged();
+            jTable1.setRowSelectionInterval(0, 0);
+            selectedInvoiceRowChanged();
+        } catch(Exception e) {}
+        
     } 
 
     public void showInvalidFileMessage() {
         showMessageDialog(null, "File is not found");
+    }
+
+    public void showSpecificMessage(String msg) {
+        showMessageDialog(null, msg.startsWith("Please") ? msg : "Wrong file format");
     }
 }
